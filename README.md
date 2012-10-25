@@ -4,6 +4,13 @@
 
 # Installation
 
+## package.el & Marmalade
+
+Octomacs is [listed][Marmalade-listing] in [Marmalade][], and can be
+installed via the `octomacs` package.
+
+## Manual
+
 Place `octomacs.el` in your Emacs `load-path`, or add it to the load
 path, and require `octomacs`.
 
@@ -47,3 +54,5 @@ name, when asked for an Octopress project.
 
 [Octopress]: http://octopress.org "Octopress site"
 [Emacs]: http://www.gnu.org/software/emacs/ "Emacs site"
+[Marmalade]: http://marmalade-repo.org/ "Marmalade Repo site"
+[Marmalade-listing]: http://marmalade-repo.org/packages/octomacs "Octomacs on Marmalade"
