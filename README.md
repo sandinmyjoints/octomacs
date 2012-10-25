@@ -7,7 +7,7 @@
 Place `octomacs.el` in your Emacs `load-path`, or add it to the load
 path, and require `octomacs`.
 
-```elisp
+```common-lisp
 (add-to-list 'load-path "/path/to/octomacs")
 (require 'octomacs)
 ```
