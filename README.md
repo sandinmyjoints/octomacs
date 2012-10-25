@@ -36,6 +36,9 @@ name, when asked for an Octopress project.
 * `ido` If ido.el is available, then it will be used when prompting
   for an Octopress project.
 
+* `rvm` If rvm.el is available, then it will be used whenever Octomacs
+  needs to run a command in the Octopress directory.
+
 # Planned features
 
 * Ability to call `rake generate`.
