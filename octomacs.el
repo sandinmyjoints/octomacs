@@ -142,7 +142,8 @@ the specified directory name.  Passes the directory through
   (let* ((default-directory (file-name-as-directory (expand-file-name directory)))
          (rvmrc-path (rvm--rvmrc-locate directory))
          (rvmrc-info (if rvmrc-path (rvm--rvmrc-read-version rvmrc-path) nil)))
-    (if rvmrc-info (rvm-use (car rvmrc-info) (car (cdr rvmrc-info)))
+    (if rvmrc-info
+        (rvm-use (car rvmrc-info) (car (cdr rvmrc-info)))
       (rvm-use-default))
     (shell-command-to-string (format "rake %s" (octomacs-format-rake-task-with-args task arguments)))))
 
