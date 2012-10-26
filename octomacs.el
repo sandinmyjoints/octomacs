@@ -80,7 +80,7 @@ Returns the directory as defined in `octomacs-workdir-alist' or
 the specified directory name.  Passes the directory through
 `expand-file-name', and `directory-file-name'."
   (let (project-or-dir)
-    (setq project-or-dir (if (fboundp 'ido-completing-read)
+    (setq project-or-dir (if (featurep 'ido)
                              (ido-completing-read
                               "Choose Octopress project: "
                               (delete-dups (append
@@ -141,11 +141,11 @@ the specified directory name.  Passes the directory through
   "Run rake task TASK with specified ARGUMENTS in DIRECTORY using rvm"
   (let* ((default-directory (file-name-as-directory (expand-file-name directory)))
          (rvmrc-path (rvm--rvmrc-locate directory))
-         (rvmrc-info (if rvmrc-path (rvm--rvmrc-read-version rvmrc-path) nil)))
-    (if rvmrc-info
-        (rvm-use (car rvmrc-info) (car (cdr rvmrc-info)))
-      (rvm-use-default))
-    (shell-command-to-string (format "rake %s" (octomacs-format-rake-task-with-args task arguments)))))
+         (rvmrc-info (if rvmrc-path (rvm--rvmrc-read-version rvmrc-path) nil))
+         (rvm-command (if rvmrc-info
+                          (concat "rvm " (mapconcat 'identity rvmrc-info "@") " do ")
+                        "")))
+    (shell-command-to-string (format "%srake %s" rvm-command (octomacs-format-rake-task-with-args task arguments)))))
 
 (defun octomacs-rake-without-rvm (directory task &optional arguments)
   "Run rake task TASK with specified ARGUMENTS in DIRECTORY"
@@ -158,12 +158,15 @@ the specified directory name.  Passes the directory through
 (defun octomacs-new-post (post-name directory)
   "Create a post called POST-NAME in the Octopress work tree in DIRECTORY"
   (interactive (octomacs-new-post-interactive))
-  (let* ((octopress-directory (file-name-as-directory directory))
+  (let* ((octopress-directory (file-name-as-directory (expand-file-name directory)))
          (rake-output (octomacs-rake octopress-directory "new_post" post-name))
          (rake-output-match-pos (string-match "Creating new post: " rake-output))
-         (file-name (concat octopress-directory
-                            (replace-regexp-in-string "\n" "" (substring rake-output (match-end 0))))))
-    (find-file file-name)))
+         (file-name (if rake-output-match-pos
+                        (concat octopress-directory (replace-regexp-in-string "\n" "" (substring rake-output (match-end 0))))
+                      nil)))
+    (if file-name
+        (find-file file-name)
+      (message (concat "Unable to create post: " rake-output)))))
 
 (provide 'octomacs)
 
