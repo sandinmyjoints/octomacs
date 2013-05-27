@@ -172,6 +172,53 @@ the specified directory name.  Passes the directory through
         (find-file file-name)
       (message (concat "Unable to create post: " rake-output)))))
 
+(defun octomacs-project-interactive ()
+  "Return the (interactive) arguments for `octomacs-shell'."
+  (let* ((project (octomacs-read-project)))
+    (list project)))
+
+(defun octomacs-generate (directory)
+  "Run rake generate in the Octopress work tree in DIRECTORY"
+  (interactive (octomacs-project-interactive))
+  (let* ((octopress-directory (file-name-as-directory (expand-file-name directory)))
+         (rake-output (octomacs-rake octopress-directory "generate"))
+         (rake-output-match-pos (string-match "Successfully generated site" rake-output)))
+    ;; TODO: When run from inside Emacs, rake generate fails with this error:
+    ;;
+    ;; Configuration from /Users/wbert/scm/sandinmyjoints/williamjohnbert.com/_config.yml
+    ;; Building site: source -> public
+    ;; /Users/wbert/.rvm/gems/ruby-1.9.3-p194@octopress/gems/jekyll-0.11.2/lib/jekyll/convertible.rb:29:in `read_yaml': invali
+    ;; d byte sequence in US-ASCII (ArgumentError)
+    ;;         from /Users/wbert/.rvm/gems/ruby-1.9.3-p194@octopress/gems/jekyll-0.11.2/lib/jekyll/post.rb:39:in `initialize'
+    ;;         from /Users/wbert/scm/sandinmyjoints/williamjohnbert.com/plugins/preview_unpublished.rb:23:in `new'
+    ;;         from /Users/wbert/scm/sandinmyjoints/williamjohnbert.com/plugins/preview_unpublished.rb:23:in `block in read_po
+    ;; sts'
+    ;;         from /Users/wbert/scm/sandinmyjoints/williamjohnbert.com/plugins/preview_unpublished.rb:21:in `each'
+    ;;         from /Users/wbert/scm/sandinmyjoints/williamjohnbert.com/plugins/preview_unpublished.rb:21:in `read_posts'
+    ;;         from /Users/wbert/.rvm/gems/ruby-1.9.3-p194@octopress/gems/jekyll-0.11.2/lib/jekyll/site.rb:128:in `read_direct
+    ;; ories'
+    ;;         from /Users/wbert/.rvm/gems/ruby-1.9.3-p194@octopress/gems/jekyll-0.11.2/lib/jekyll/site.rb:98:in `read'
+    ;;         from /Users/wbert/.rvm/gems/ruby-1.9.3-p194@octopress/gems/jekyll-0.11.2/lib/jekyll/site.rb:38:in `process'
+    ;;         from /Users/wbert/.rvm/gems/ruby-1.9.3-p194@octopress/gems/jekyll-0.11.2/bin/jekyll:250:in `<top (required)>'
+    ;;         from /Users/wbert/.rvm/gems/ruby-1.9.3-p194@octopress/bin/jekyll:19:in `load'
+    ;;         from /Users/wbert/.rvm/gems/ruby-1.9.3-p194@octopress/bin/jekyll:19:in `<main>'
+    ;;         from /Users/wbert/.rvm/gems/ruby-1.9.3-p194@octopress/bin/ruby_noexec_wrapper:14:in `eval'
+    ;;         from /Users/wbert/.rvm/gems/ruby-1.9.3-p194@octopress/bin/ruby_noexec_wrapper:14:in `<main>'
+
+    (if rake-output-match-pos
+                        (message "Successfully generated site.")
+      (message (concat "Error generating site:" rake-output)))))
+
+(defun octomacs-shell (project)
+  "Run a shell in the Octopress directory. TODO: Start rvm automatically."
+  (interactive (octomacs-project-interactive))
+  (let* ((default-directory project))
+    (ansi-term (or explicit-shell-file-name
+					       (getenv "ESHELL")
+					       (getenv "SHELL")
+					       "/bin/sh")
+               (concat "*" "octopress-term" "*"))))
+
 (provide 'octomacs)
 
 ;;; octomacs.el ends here
