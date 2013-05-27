@@ -140,6 +140,11 @@ the specified directory name.  Passes the directory through
 (defun octomacs-rake-with-rvm (directory task &optional arguments)
   "Run rake task TASK with specified ARGUMENTS in DIRECTORY using rvm"
   (let* ((default-directory (file-name-as-directory (expand-file-name directory)))
+         ;; HACK: The rvm--* functions below will be searching for rvm config
+         ;; files based on `buffer-file-name`, but we want them to search in the
+         ;; Octopress directory, not the one where this file (octomacs.el) is
+         ;; located. So shadow buffer-file-name for a bit.
+         (buffer-file-name (expand-file-name directory))
          (rvmrc-info (or (rvm--load-info-rvmrc) (rvm--load-info-ruby-version) (rvm--load-info-gemfile)))
          (rvm-command (if rvmrc-info
                           (concat "rvm " (mapconcat 'identity rvmrc-info "@") " do ")
