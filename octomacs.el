@@ -140,8 +140,7 @@ the specified directory name.  Passes the directory through
 (defun octomacs-rake-with-rvm (directory task &optional arguments)
   "Run rake task TASK with specified ARGUMENTS in DIRECTORY using rvm"
   (let* ((default-directory (file-name-as-directory (expand-file-name directory)))
-         (rvmrc-path (rvm--rvmrc-locate directory))
-         (rvmrc-info (if rvmrc-path (rvm--rvmrc-read-version rvmrc-path) nil))
+         (rvmrc-info (or (rvm--load-info-rvmrc) (rvm--load-info-ruby-version) (rvm--load-info-gemfile)))
          (rvm-command (if rvmrc-info
                           (concat "rvm " (mapconcat 'identity rvmrc-info "@") " do ")
                         "")))
